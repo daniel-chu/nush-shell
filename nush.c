@@ -8,57 +8,64 @@
 
 #include "tokens.h"
 #include "built_in.h"
+#include "redirects.h"
 
 // creates a null terminated array of arguments using the start (inclusive) and end index (exclusive)
-char**
-create_args(int start, int end, svec* tokens)
-{
-    int size = end - start + 2; // extra room for the null terminator
-    char** args = malloc(size * sizeof(char*));
+// char**
+// create_args(int start, int end, svec* tokens)
+// {
+//     int size = end - start + 2; // extra room for the null terminator
+//     char** args = malloc(size * sizeof(char*));
 
-    int ii;
-    for(ii = 0; ii < tokens->size; ++ii) {
-        args[ii] = tokens->data[ii];
-    }
-    args[ii] = 0;
+//     int ii;
+//     for(ii = 0; ii < tokens->size; ++ii) {
+//         args[ii] = tokens->data[ii];
+//     }
+//     args[ii] = 0;
 
-    return args;
-}   
+//     return args;
+// }   
 
 void
 execute(svec* tokens)
 {
-    // built in cmds
-    int built_in_cmd_index = get_built_in_cmd_index(tokens->data[0]);
-    if(built_in_cmd_index != -1) {
-        exec_built_in_cmd(built_in_cmd_index, tokens);
+    // TODO ========== REDIRECT ===========  
+    int redirect_operator_index = get_redirect_operator_index(tokens);
+    if(redirect_operator_index != -1) {
+        exec_redirect_cmd(redirect_operator_index, tokens);
+        return;
     }
 
-    // programs
+    // TODO ========== PIPE ===========  
+
+    // TODO ========== OTHER OPERATORS ===========
+
+
+    // ========== BUILT INS ===========
+    int built_in_cmd_code = get_built_in_cmd_code(tokens->data[0]);
+    if(built_in_cmd_code != -1) {
+        exec_built_in_cmd(built_in_cmd_code, tokens);
+        return;
+    }
+
+    // ========== PROGRAMS ===========
     int cpid;
     // if cpid != 0, we are in the parent process
     if((cpid = fork())) {
-
-        printf("Parent pid: %d\n", getpid());
-        printf("Parent knows child pid: %d\n", cpid);
-
         int status;
         waitpid(cpid, &status, 0);
-
-        printf("== executed program complete ==\n");
-
-        printf("child returned with wait code %d\n", status);
         if (WIFEXITED(status)) {
-            printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
+            if(status != 0) {
+                printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
+            }
         }
 
     } else {        // if cpid is 0 (the else case), we are in the child process
-        printf("Child pid: %d\n", getpid());
-        printf("Child knows parent pid: %d\n", getppid());
-
         char* cmd = tokens->data[0];
 
-        char** args = create_args(0, tokens->size, tokens);
+        // char** args = create_args(0, tokens->size, tokens);
+
+        char** args = tokens->data;
 
         // TODO DEBUG SECTION
         // printf("****************** DEBUG INFO ********************************\n");
@@ -71,10 +78,7 @@ execute(svec* tokens)
         //     printf("ARG: %s\n", args[ii]);
         // }
         // printf("**************************************************************\n");
-
-        printf("== executed program's output: ==\n");
         execvp(cmd, args);
-        printf("Can't get here, exec only returns on error.\n");
         // using errno.h, we can get the error code so it prints (rather than just giving us 0)
         exit(errno);
     }
@@ -94,19 +98,8 @@ main(int argc, char* argv[])
             if(lc == 0) {
                 break;
             }
-            tokens = tokenize_line(cmd);
-
+            svec* tokens = tokenize_line(cmd);
             execute(tokens);
-
-            // TODO DEBUG SECTION
-            // ***** PRINT TOKENS ******
-            // int ii;
-            // for(ii = 0; ii < tokens->size; ++ii) {
-            //     printf("%s\n", tokens->data[ii]);
-            // }
-            // *************************
-
-            free_svec(tokens);
         }
     } else {
         // TODO READ FROM FILE
@@ -123,5 +116,6 @@ main(int argc, char* argv[])
 
     // execute(cmd);
 
+    free_svec(tokens);
     return 0;
 }

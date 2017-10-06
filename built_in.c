@@ -19,7 +19,7 @@ lengthof_built_ins() {
 }
 
 int
-get_built_in_cmd_index(char* cmd) {
+get_built_in_cmd_code(char* cmd) {
     int ii;
     for(ii = 0; ii < lengthof_built_ins(); ++ii) {
         if(strcmp(cmd, built_in_cmd_strings[ii]) == 0) {
@@ -30,8 +30,8 @@ get_built_in_cmd_index(char* cmd) {
 }
 
 int
-exec_built_in_cmd(int index, svec* tokens) {
-    return built_in_cmds[index](tokens);
+exec_built_in_cmd(int code, svec* tokens) {
+    return built_in_cmds[code](tokens);
 }
 
 int

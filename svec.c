@@ -8,7 +8,7 @@ make_svec() {
     svec* xs = malloc(sizeof(svec));
     xs->size = 0;
     xs->capacity = 2;
-    xs->data = malloc(2 * sizeof(char*));
+    xs->data = malloc((xs->capacity + 1) * sizeof(char*));
 
     return xs;
 }
@@ -29,7 +29,7 @@ void
 svec_push(svec* xs, char* x) {
     if(xs->size >= xs->capacity) {
         xs->capacity *= 2;
-        xs->data = (char**) realloc(xs->data, xs->capacity * sizeof(char*));
+        xs->data = (char**) realloc(xs->data, (xs->capacity + 1) * sizeof(char*));
     }
 
     // note: when I need to put into index i, I will need to free(xs->data[ii]) before i insert (or mem leak)

@@ -91,6 +91,6 @@ tokenize_line(char* line)
     svec* xs;
     xs = make_svec();
     handle_line(line, xs);
-
+    xs->data[xs->size] = 0;
     return xs;
 }
