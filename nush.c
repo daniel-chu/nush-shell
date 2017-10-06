@@ -87,9 +87,8 @@ execute(svec* tokens)
 int
 main(int argc, char* argv[])
 {
-    svec* tokens;
-    char cmd[256];
     if (argc == 1) {
+        char cmd[256];
         for(;;) {
             printf("nush$ ");
             fflush(stdout);
@@ -99,10 +98,24 @@ main(int argc, char* argv[])
                 break;
             }
             svec* tokens = tokenize_line(cmd);
+
             execute(tokens);
+            free_svec(tokens);
         }
     } else {
         // TODO READ FROM FILE
+        FILE* file = fopen(argv[1], "r");
+        char cmd[256];
+        for(;;) {
+            char* lc = fgets(cmd, 256, file);
+            if(lc == 0) {
+                break;
+            }
+            svec* tokens = tokenize_line(cmd);
+            execute(tokens);
+            free_svec(tokens);    
+        }
+        fclose(file);
     }
 
     // if (argc == 1) {
@@ -116,6 +129,6 @@ main(int argc, char* argv[])
 
     // execute(cmd);
 
-    free_svec(tokens);
+
     return 0;
 }
