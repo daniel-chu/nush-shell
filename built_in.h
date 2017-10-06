@@ -7,8 +7,8 @@
 int
 lengthof_built_ins();
 
-// gets the index of the function that handles the given built in cmd.
-// if it is not a built in cmd, then return -1
+// returns the code of the built in cmd that cmd is
+// (the index used to pull associated function out of array of functions)
 int
 get_built_in_cmd_code(char* cmd);
 
@@ -23,6 +23,5 @@ nush_cd(svec* tokens);
 // does exit
 int
 nush_exit(svec* tokens);
-
 
 #endif

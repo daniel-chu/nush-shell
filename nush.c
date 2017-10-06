@@ -8,23 +8,9 @@
 
 #include "tokens.h"
 #include "built_in.h"
+#include "pipe.h"
 #include "redirects.h"
-
-// creates a null terminated array of arguments using the start (inclusive) and end index (exclusive)
-// char**
-// create_args(int start, int end, svec* tokens)
-// {
-//     int size = end - start + 2; // extra room for the null terminator
-//     char** args = malloc(size * sizeof(char*));
-
-//     int ii;
-//     for(ii = 0; ii < tokens->size; ++ii) {
-//         args[ii] = tokens->data[ii];
-//     }
-//     args[ii] = 0;
-
-//     return args;
-// }   
+#include "nush.h"
 
 void
 execute(svec* tokens)
@@ -37,6 +23,11 @@ execute(svec* tokens)
     }
 
     // TODO ========== PIPE ===========  
+    int pipe_index = get_pipe_index(tokens);
+    if(pipe_index != -1) {
+        handle_and_exec_pipe(pipe_index, tokens);
+        return;
+    }
 
     // TODO ========== OTHER OPERATORS ===========
 
@@ -63,8 +54,6 @@ execute(svec* tokens)
     } else {        // if cpid is 0 (the else case), we are in the child process
         char* cmd = tokens->data[0];
 
-        // char** args = create_args(0, tokens->size, tokens);
-
         char** args = tokens->data;
 
         // TODO DEBUG SECTION
@@ -79,7 +68,6 @@ execute(svec* tokens)
         // }
         // printf("**************************************************************\n");
         execvp(cmd, args);
-        // using errno.h, we can get the error code so it prints (rather than just giving us 0)
         exit(errno);
     }
 }
@@ -103,7 +91,6 @@ main(int argc, char* argv[])
             free_svec(tokens);
         }
     } else {
-        // TODO READ FROM FILE
         FILE* file = fopen(argv[1], "r");
         char cmd[256];
         for(;;) {
@@ -117,18 +104,6 @@ main(int argc, char* argv[])
         }
         fclose(file);
     }
-
-    // if (argc == 1) {
-    //     printf("nush$ ");
-    //     fflush(stdout);
-    //     fgets(cmd, 256, stdin);
-    // }
-    // else {
-    //     memcpy(cmd, "echo", 5);
-    // }
-
-    // execute(cmd);
-
 
     return 0;
 }

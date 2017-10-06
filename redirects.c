@@ -4,6 +4,7 @@
 
 #include "redirects.h"
 #include "svec.h"
+#include "nush.h"
 
 char* redirect_operators[] = {">", "<"};
 
@@ -11,6 +12,11 @@ int (*redirect_functions[]) (int index, svec* tokens) = {
     *nush_redirect_out,
     *nush_redirect_in
 };
+
+int
+lengthof_redirect_operators() {
+    return sizeof(redirect_operators) / sizeof(redirect_operators[0]);
+}
 
 int
 get_redirect_operator_code(char* str) {
@@ -35,24 +41,21 @@ get_redirect_operator_index(svec* tokens) {
 }
 
 int
-lengthof_redirect_operators() {
-    return sizeof(redirect_operators) / sizeof(redirect_operators[0]);
+exec_redirect_cmd(int index, svec* tokens) {
+    int redirect_operator_code = get_redirect_operator_code(tokens->data[index]);
+    return redirect_functions[redirect_operator_code](index, tokens);
 }
 
 int
 nush_redirect_out(int index, svec* tokens) {
+    // TODO
     printf("REDIRECT OUT AT INDEX: %d\n", index);
     return 0;
 }
 
 int
 nush_redirect_in(int index, svec* tokens) {
+    // TODO
     printf("REDIRECT IN AT INDEX: %d\n", index);
     return 0;
-}
-
-int
-exec_redirect_cmd(int index, svec* tokens) {
-    int redirect_operator_code = get_redirect_operator_code(tokens->data[index]);
-    return redirect_functions[redirect_operator_code](index, tokens);
 }
