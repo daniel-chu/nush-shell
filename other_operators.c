@@ -43,6 +43,17 @@ get_other_operator_index(svec* tokens) {
 }
 
 int
+get_index_semicolon(svec* tokens) {
+    int ii;
+    for (ii = 0; ii < tokens->size; ++ii) {
+        if(strcmp(tokens->data[ii], ";") == 0) {
+            return ii;
+        }
+    }
+    return -1;
+}
+
+int
 exec_other_operator_func(int index, svec* tokens) {
     int code = get_other_operator_code(tokens->data[index]);
     return other_operator_funcs[code](index, tokens);
@@ -87,4 +98,13 @@ nush_background(int index, svec* tokens) {
 
     free_svec(command);
     return 0;
+}
+
+int
+nush_semicolon(int index, svec* tokens) {
+    svec* left = svec_subvec(tokens, 0, index);
+    svec* right = svec_subvec(tokens, index + 1, tokens->size);
+
+    execute(left);
+    return execute(right);
 }

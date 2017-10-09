@@ -16,6 +16,12 @@
 int
 execute(svec* tokens)
 {
+    // ========== SEMICOLON ===========
+    int semicolon_index = get_index_semicolon(tokens);
+    if(semicolon_index != -1) {
+        return nush_semicolon(semicolon_index, tokens);
+    }
+
     // ========== REDIRECT ===========  
     int redirect_operator_index = get_redirect_operator_index(tokens);
     if(redirect_operator_index != -1) {

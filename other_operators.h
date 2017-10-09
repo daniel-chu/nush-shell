@@ -12,6 +12,9 @@ int get_other_operator_code(char* cmd);
 // returns the index in the svec that the operator is at
 int get_other_operator_index(svec* tokens);
 
+// returns the index of the first semicolon, -1 if none.
+int get_index_semicolon(svec* tokens);
+
 int exec_other_operator_func(int index, svec* tokens);
 
 int nush_and(int index, svec* tokens);
@@ -19,5 +22,7 @@ int nush_and(int index, svec* tokens);
 int nush_or(int index, svec* tokens);
 
 int nush_background(int index, svec* tokens);
+
+int nush_semicolon(int index, svec* tokens);
 
 #endif
