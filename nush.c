@@ -11,7 +11,7 @@
 #include "pipe.h"
 #include "redirects.h"
 #include "nush.h"
-
+#include "other_operators.h"
 
 void
 execute(svec* tokens)
@@ -31,7 +31,11 @@ execute(svec* tokens)
     }
 
     // TODO ========== OTHER OPERATORS ===========
-
+    int other_operator_index = get_other_operator_index(tokens);
+    if(other_operator_index != -1) {
+        exec_other_operator_func(other_operator_index, tokens);
+        return;
+    }
 
     // ========== BUILT INS ===========
     int built_in_cmd_code = get_built_in_cmd_code(tokens->data[0]);
