@@ -13,35 +13,31 @@
 #include "nush.h"
 #include "other_operators.h"
 
-void
+int
 execute(svec* tokens)
 {
     // ========== REDIRECT ===========  
     int redirect_operator_index = get_redirect_operator_index(tokens);
     if(redirect_operator_index != -1) {
-        exec_redirect_cmd(redirect_operator_index, tokens);
-        return;
+        return exec_redirect_cmd(redirect_operator_index, tokens);
     }
 
     // TODO ========== PIPE ===========  
     int pipe_index = get_pipe_index(tokens);
     if(pipe_index != -1) {
-        handle_and_exec_pipe(pipe_index, tokens);
-        return;
+        return handle_and_exec_pipe(pipe_index, tokens);
     }
 
-    // TODO ========== OTHER OPERATORS ===========
+    // ========== OTHER OPERATORS ===========
     int other_operator_index = get_other_operator_index(tokens);
     if(other_operator_index != -1) {
-        exec_other_operator_func(other_operator_index, tokens);
-        return;
+        return exec_other_operator_func(other_operator_index, tokens);
     }
 
     // ========== BUILT INS ===========
     int built_in_cmd_code = get_built_in_cmd_code(tokens->data[0]);
     if(built_in_cmd_code != -1) {
-        exec_built_in_cmd(built_in_cmd_code, tokens);
-        return;
+        return exec_built_in_cmd(built_in_cmd_code, tokens);
     }
 
     // ========== PROGRAMS ===========
@@ -52,7 +48,8 @@ execute(svec* tokens)
         waitpid(cpid, &status, 0);
         if (WIFEXITED(status)) {
             if(status != 0) {
-                printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
+                // printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
+                return status;
             }
         }
 
@@ -75,6 +72,8 @@ execute(svec* tokens)
         execvp(cmd, args);
         exit(errno);
     }
+
+    return 0;
 }
 
 int

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include "nush.h"
 #include "other_operators.h"
 #include "svec.h"
 
@@ -49,15 +50,25 @@ exec_other_operator_func(int index, svec* tokens) {
 
 int
 nush_and(int index, svec* tokens) {
-    // TODO
-    printf("AND OPERATOR FOUND AT INDEX: %d\n", index);
+    svec* left = svec_subvec(tokens, 0, index);
+    svec* right = svec_subvec(tokens, index + 1, tokens->size);
+
+    if(execute(left) == 0) {
+        execute(right);
+    }
+
     return 0;
 }
 
 int
 nush_or(int index, svec* tokens) {
-    // TODO
-    printf("OR OPERATOR FOUND AT INDEX: %d\n", index);
+    svec* left = svec_subvec(tokens, 0, index);
+    svec* right = svec_subvec(tokens, index + 1, tokens->size);
+
+    if(execute(left) != 0) {
+        execute(right);
+    }
+
     return 0;
 }
 

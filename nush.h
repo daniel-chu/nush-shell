@@ -3,6 +3,6 @@
 
 #include "svec.h"
 
-void execute(svec* tokens);
+int execute(svec* tokens);
 
 #endif
