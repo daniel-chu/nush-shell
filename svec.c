@@ -36,3 +36,16 @@ svec_push(svec* xs, char* x) {
     // this is currently fine because we are only pushing to the end of the vector here
     xs->data[xs->size++] = strdup(x);
 }
+
+svec*
+svec_subvec(svec* xs, int start, int end) {
+    svec* result = make_svec();
+
+    int ii;
+    for(ii = start; ii < end; ++ii) {
+        svec_push(result, xs->data[ii]);
+    }
+    result->data[result->size] = 0;
+
+    return result;
+}

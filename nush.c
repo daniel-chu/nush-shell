@@ -12,10 +12,11 @@
 #include "redirects.h"
 #include "nush.h"
 
+
 void
 execute(svec* tokens)
 {
-    // TODO ========== REDIRECT ===========  
+    // ========== REDIRECT ===========  
     int redirect_operator_index = get_redirect_operator_index(tokens);
     if(redirect_operator_index != -1) {
         exec_redirect_cmd(redirect_operator_index, tokens);
