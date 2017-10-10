@@ -16,6 +16,10 @@
 int
 execute(svec* tokens)
 {
+    if(tokens->size == 0) {
+        return 1;
+    }
+
     // ========== SEMICOLON ===========
     int semicolon_index = get_index_semicolon(tokens);
     if(semicolon_index != -1) {
@@ -50,6 +54,10 @@ execute(svec* tokens)
     int cpid;
     // if cpid != 0, we are in the parent process
     if((cpid = fork())) {
+
+        // printf("Parent pid: %d\n", getpid());
+        // printf("Parent knows child pid: %d\n", cpid);
+
         int status;
         waitpid(cpid, &status, 0);
         if (WIFEXITED(status)) {
@@ -59,13 +67,21 @@ execute(svec* tokens)
             }
         }
 
-    } else {        // if cpid is 0 (the else case), we are in the child process
-        char* cmd = tokens->data[0];
+        // printf("== executed program complete ==\n");
 
+        // printf("child returned with wait code %d\n", status);
+        if (WIFEXITED(status)) {
+            // printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
+        }
+
+    } else {        // if cpid is 0 (the else case), we are in the child process
+        // printf("Child pid: %d\n", getpid());
+        // printf("Child knows parent pid: %d\n", getppid());
+
+        char* cmd = tokens->data[0];
         char** args = tokens->data;
 
-        // TODO DEBUG SECTION
-        // printf("****************** DEBUG INFO ********************************\n");
+        // printf("****************** DEBUG START ********************************\n");
         // int ii;
         // for(ii = 0; ii < tokens->size; ++ii) {
         //     printf("TOKEN: %s\n", tokens->data[ii]);
@@ -74,8 +90,11 @@ execute(svec* tokens)
         // for(ii = 0; ii < 3; ++ii) {
         //     printf("ARG: %s\n", args[ii]);
         // }
-        // printf("**************************************************************\n");
+        // printf("****************** END DEBUG **************************\n");
+
+        // printf("== executed program's output: ==\n");
         execvp(cmd, args);
+        // printf("Can't get here, exec only returns on error.");
         exit(errno);
     }
 
