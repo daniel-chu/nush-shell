@@ -29,14 +29,17 @@ char*
 read_paren_token(char* line)
 {
     int paren_counter = 0;
-    
+    int is_inside_quote = 0; // 0 means we are not, 1 means we are inside
+
     char* lookaheadCounter = line;
     int sizeString = 0;
 
     do {
-        if(*lookaheadCounter == '(') {
+        if(*lookaheadCounter == '\"') {
+            is_inside_quote = (is_inside_quote) ? 0 : 1;
+        } else if(*lookaheadCounter == '(' && !is_inside_quote) {
             paren_counter++;
-        } else if(*lookaheadCounter == ')') {
+        } else if(*lookaheadCounter == ')'&& !is_inside_quote) {
             paren_counter--;
         }
         ++sizeString;
@@ -112,17 +115,17 @@ handle_line(char* line, svec* xs)
     while(*line != 0) {
         if(isspace(*line)) {
             line++;
-        } else if(*line == '(') {
-            paren_token = read_paren_token(line);
-            svec_push(xs, paren_token);
-            line += strlen(paren_token);
-            free(paren_token);
         } else if(*line == '\"') {
             quote_token = read_quotes_token(line);
             svec_push(xs, quote_token);
             // + 2 because we want to skip the open/close quotes
             line += strlen(quote_token) + 2;
             free(quote_token);
+        } else if(*line == '(') {
+            paren_token = read_paren_token(line);
+            svec_push(xs, paren_token);
+            line += strlen(paren_token);
+            free(paren_token);
         } else if(isoperator(*line)) {
             operator = read_operator(line);
             svec_push(xs, operator);

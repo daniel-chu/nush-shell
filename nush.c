@@ -32,13 +32,6 @@ remove_first_and_last_chars(char* string)
 int
 execute(svec* tokens)
 {
-    // =====================
-    // int ii;
-    // for(ii = 0; ii < tokens->size; ++ii) {
-    //     printf("TOKEN: %s\n", tokens->data[ii]);
-    // }
-    // =====================
-
     if(tokens->size == 0) {
         return 1;
     }
@@ -131,27 +124,74 @@ main(int argc, char* argv[])
 {
     if (argc == 1) {
         char cmd[256];
+        char temp[256];
         for(;;) {
             printf("nush$ ");
             fflush(stdout);
 
-            char* lc = fgets(cmd, 256, stdin);
+            char* lc = fgets(temp, 256, stdin);
             if(lc == 0) {
                 break;
             }
-            svec* tokens = tokenize_line(cmd);
 
+            strcpy(cmd, temp);
+
+            while(temp[strlen(temp) - 2] == '\\') {
+                printf("> ");
+
+                // if the last two chars of command are \ and the null terminator,
+                // we need to remove that before we continue appending
+                if(cmd[strlen(cmd) - 2] == '\\') {
+                    char new_cmd[256];
+                    memcpy(new_cmd, cmd, strlen(cmd) - 2);
+                    new_cmd[strlen(cmd) - 2] = 0;
+
+                    strcpy(cmd, new_cmd);
+                }
+
+                lc = fgets(temp, 256, stdin);
+                if(lc == 0) {
+                    break;
+                }                
+                strncat(cmd, temp, 256 - strlen(cmd));
+            }
+
+            svec* tokens = tokenize_line(cmd);
             execute(tokens);
             free_svec(tokens);
         }
     } else {
         FILE* file = fopen(argv[1], "r");
         char cmd[256];
+        char temp[256];
         for(;;) {
-            char* lc = fgets(cmd, 256, file);
+            char* lc = fgets(temp, 256, file);
             if(lc == 0) {
                 break;
             }
+
+            // TODO remove "\ " before catting. \ and the null terminator
+
+            strcpy(cmd, temp);
+
+            while(temp[strlen(temp) - 2] == '\\') {
+                // if the last two chars of command are \ and the null terminator,
+                // we need to remove that before we continue appending
+                if(cmd[strlen(cmd) - 2] == '\\') {
+                    char new_cmd[256];
+                    memcpy(new_cmd, cmd, strlen(cmd) - 2);
+                    new_cmd[strlen(cmd) - 2] = 0;
+
+                    strcpy(cmd, new_cmd);
+                }
+
+                lc = fgets(temp, 256, file);
+                if(lc == 0) {
+                    break;
+                }                
+                strncat(cmd, temp, 256 - strlen(cmd));
+            }
+
             svec* tokens = tokenize_line(cmd);
             execute(tokens);
             free_svec(tokens);
