@@ -67,7 +67,7 @@ nush_redirect_out(int index, svec* tokens) {
         dup2(write_fileno, 1);
         
         execute(left);
-        exit(0);
+        _exit(0);
         // execvp(left->data[0], left->data);
     }
 

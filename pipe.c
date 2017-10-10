@@ -42,7 +42,7 @@ handle_and_exec_pipe(int index, svec* tokens)
         dup2(pipes[1], 1);
 
         execute(left);
-        exit(0);
+        _exit(0);
     }
 
     if(!(cpid2 = fork())) {
@@ -51,7 +51,7 @@ handle_and_exec_pipe(int index, svec* tokens)
         dup2(pipes[0], 0);
 
         execute(right);
-        exit(0);
+        _exit(0);
     }
 
     close(pipes[0]);

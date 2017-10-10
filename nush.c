@@ -54,12 +54,14 @@ execute(svec* tokens)
     int cpid;
     // if cpid != 0, we are in the parent process
     if((cpid = fork())) {
-
+        // printf("SPAWNED A CHILD PROCESS WITH CPID: %d, FROM PID: %d\n", cpid, getpid());
         // printf("Parent pid: %d\n", getpid());
         // printf("Parent knows child pid: %d\n", cpid);
 
         int status;
         waitpid(cpid, &status, 0);
+
+        // printf("child returned with wait code %d\n", status);
         if (WIFEXITED(status)) {
             if(status != 0) {
                 // printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
@@ -69,28 +71,12 @@ execute(svec* tokens)
 
         // printf("== executed program complete ==\n");
 
-        // printf("child returned with wait code %d\n", status);
-        if (WIFEXITED(status)) {
-            // printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
-        }
-
     } else {        // if cpid is 0 (the else case), we are in the child process
         // printf("Child pid: %d\n", getpid());
         // printf("Child knows parent pid: %d\n", getppid());
 
         char* cmd = tokens->data[0];
         char** args = tokens->data;
-
-        // printf("****************** DEBUG START ********************************\n");
-        // int ii;
-        // for(ii = 0; ii < tokens->size; ++ii) {
-        //     printf("TOKEN: %s\n", tokens->data[ii]);
-        // }
-
-        // for(ii = 0; ii < 3; ++ii) {
-        //     printf("ARG: %s\n", args[ii]);
-        // }
-        // printf("****************** END DEBUG **************************\n");
 
         // printf("== executed program's output: ==\n");
         execvp(cmd, args);
@@ -129,7 +115,7 @@ main(int argc, char* argv[])
             }
             svec* tokens = tokenize_line(cmd);
             execute(tokens);
-            free_svec(tokens);    
+            free_svec(tokens);
         }
         fclose(file);
     }
