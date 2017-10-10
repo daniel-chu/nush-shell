@@ -13,9 +13,32 @@
 #include "nush.h"
 #include "other_operators.h"
 
+// removes the first and last characters, used to remove parens.
+char*
+remove_first_and_last_chars(char* string)
+{
+
+    int string_len = strlen(string);
+    int result_len = string_len - 2;
+    string++;
+
+    char* result = malloc(result_len + 1);
+    memcpy(result, string, result_len);
+    result[result_len] = 0;
+
+    return result;
+}
+
 int
 execute(svec* tokens)
 {
+    // =====================
+    // int ii;
+    // for(ii = 0; ii < tokens->size; ++ii) {
+    //     printf("TOKEN: %s\n", tokens->data[ii]);
+    // }
+    // =====================
+
     if(tokens->size == 0) {
         return 1;
     }
@@ -24,6 +47,22 @@ execute(svec* tokens)
     int semicolon_index = get_index_semicolon(tokens);
     if(semicolon_index != -1) {
         return nush_semicolon(semicolon_index, tokens);
+    }
+
+    // ========= PARANTHESES ===========
+    // if there is one token, and it starts and ends with a parantheses, we need to tokenize the
+    // contents of the parentheses after removing the parens and then pass those tokens back into execute
+    char* first_token = tokens->data[0];
+    int starts_with_parens = strncmp(first_token, "(", 1) == 0;
+    if(tokens->size == 1 && starts_with_parens) {
+        char* inner_string = remove_first_and_last_chars(first_token);
+        svec* inner_tokens = tokenize_line(inner_string);
+        free(inner_string);
+
+        execute(inner_tokens);
+        free(inner_tokens);
+        // TODO how to return execute(inner_tokens) but also free inner_tokens?
+        return 0;
     }
 
     // ========== REDIRECT ===========  

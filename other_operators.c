@@ -93,7 +93,8 @@ nush_background(int index, svec* tokens) {
         int status;
     } else {
         // execute(command);
-        execvp(command->data[0], command->data);
+        execute(command);
+        _exit(0);
     }
 
     free_svec(command);
