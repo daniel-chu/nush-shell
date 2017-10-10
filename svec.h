@@ -7,8 +7,10 @@ typedef struct svec {
     int capacity;
 } svec;
 
+// makes an empty svec with capacity 2 and size 0
 svec* make_svec();
 
+// frees svec
 void free_svec(svec* xs);
 
 // pushes a char* onto the end of the given svec

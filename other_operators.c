@@ -85,7 +85,6 @@ nush_or(int index, svec* tokens) {
 
 int
 nush_background(int index, svec* tokens) {
-    // TODO check over this
     svec* command = svec_subvec(tokens, 0, index);
 
     int cpid;

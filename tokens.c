@@ -8,10 +8,9 @@
 char*
 read_quotes_token(char* line)
 {    
+    // passes the first quote
     char* lookaheadCounter = line + 1;
     int sizeString = 0;
-
-    // passes the first quote
 
     while(*lookaheadCounter != 0 && *lookaheadCounter != '\"') {
         ++sizeString;

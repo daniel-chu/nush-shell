@@ -3,10 +3,6 @@
 
 #include "svec.h"
 
-// returns length of the built in cmd array
-int
-lengthof_built_ins();
-
 // returns the code of the built in cmd that cmd is
 // (the index used to pull associated function out of array of functions)
 int

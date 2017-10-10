@@ -17,7 +17,6 @@
 char*
 remove_first_and_last_chars(char* string)
 {
-
     int string_len = strlen(string);
     int result_len = string_len - 2;
     string++;
@@ -43,7 +42,7 @@ execute(svec* tokens)
     }
 
     // ========= PARANTHESES ===========
-    // if there is one token, and it starts and ends with a parantheses, we need to tokenize the
+    // if there is one token, and it starts and ends with a parentheses, we need to tokenize the
     // contents of the parentheses after removing the parens and then pass those tokens back into execute
     char* first_token = tokens->data[0];
     int starts_with_parens = strncmp(first_token, "(", 1) == 0;
@@ -52,10 +51,9 @@ execute(svec* tokens)
         svec* inner_tokens = tokenize_line(inner_string);
         free(inner_string);
 
-        execute(inner_tokens);
+        int return_code = execute(inner_tokens);
         free(inner_tokens);
-        // TODO how to return execute(inner_tokens) but also free inner_tokens?
-        return 0;
+        return return_code;
     }
 
     // ========== REDIRECT ===========  
@@ -64,7 +62,7 @@ execute(svec* tokens)
         return exec_redirect_cmd(redirect_operator_index, tokens);
     }
 
-    // TODO ========== PIPE ===========  
+    // ========== PIPE ===========  
     int pipe_index = get_pipe_index(tokens);
     if(pipe_index != -1) {
         return handle_and_exec_pipe(pipe_index, tokens);
@@ -84,35 +82,23 @@ execute(svec* tokens)
 
     // ========== PROGRAMS ===========
     int cpid;
-    // if cpid != 0, we are in the parent process
     if((cpid = fork())) {
-        // printf("SPAWNED A CHILD PROCESS WITH CPID: %d, FROM PID: %d\n", cpid, getpid());
-        // printf("Parent pid: %d\n", getpid());
-        // printf("Parent knows child pid: %d\n", cpid);
-
+        // parent
         int status;
         waitpid(cpid, &status, 0);
 
-        // printf("child returned with wait code %d\n", status);
         if (WIFEXITED(status)) {
             if(status != 0) {
-                // printf("child exited with exit code (or main returned) %d\n", WEXITSTATUS(status));
                 return status;
             }
         }
 
-        // printf("== executed program complete ==\n");
-
-    } else {        // if cpid is 0 (the else case), we are in the child process
-        // printf("Child pid: %d\n", getpid());
-        // printf("Child knows parent pid: %d\n", getppid());
-
+    } else {
+        // child
         char* cmd = tokens->data[0];
         char** args = tokens->data;
 
-        // printf("== executed program's output: ==\n");
         execvp(cmd, args);
-        // printf("Can't get here, exec only returns on error.");
         exit(errno);
     }
 
@@ -136,6 +122,7 @@ main(int argc, char* argv[])
 
             strcpy(cmd, temp);
 
+            // handles the \ character, allowing the user to continue entering on the next line
             while(temp[strlen(temp) - 2] == '\\') {
                 printf("> ");
 
@@ -170,10 +157,9 @@ main(int argc, char* argv[])
                 break;
             }
 
-            // TODO remove "\ " before catting. \ and the null terminator
-
             strcpy(cmd, temp);
 
+            // handles the \ character, allowing the user to continue entering on the next line
             while(temp[strlen(temp) - 2] == '\\') {
                 // if the last two chars of command are \ and the null terminator,
                 // we need to remove that before we continue appending

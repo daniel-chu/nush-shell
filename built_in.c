@@ -36,10 +36,8 @@ exec_built_in_cmd(int code, svec* tokens) {
 
 int
 nush_cd(svec* tokens) {
-    // TODO do we need to handle cmd "cd" and go to home directory?
-    // TODO "cd ~" may not work, how to handle this?
     if(tokens->data[1] == 0 || strcmp(tokens->data[1], "~") == 0) {
-        // change to home directory here if needed
+        // change to home directory here if required
     } else {
         chdir(tokens->data[1]);
     }
