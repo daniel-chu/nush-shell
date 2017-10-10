@@ -66,10 +66,10 @@ nush_redirect_out(int index, svec* tokens) {
         close(1);
         // set file to be 1 in file descriptor table
         char rv = dup(write_fileno);
-
-        // TODO IF WE NEED TO RECURSE (EXECUTE) ON THE LEFT SIDE, FIGURE THIS OUT
-        // execute(left);
-        execvp(left->data[0], left->data);
+        
+        execute(left);
+        exit(0);
+        // execvp(left->data[0], left->data);
     }
 
     free_svec(left);
