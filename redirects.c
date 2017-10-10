@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "redirects.h"
 #include "svec.h"
@@ -62,10 +63,8 @@ nush_redirect_out(int index, svec* tokens) {
         int status;
         waitpid(cpid, &status, 0);
     } else {    // child
-        // close stdout
-        close(1);
         // set file to be 1 in file descriptor table
-        char rv = dup(write_fileno);
+        dup2(write_fileno, 1);
         
         execute(left);
         exit(0);
@@ -76,6 +75,7 @@ nush_redirect_out(int index, svec* tokens) {
     free_svec(right);
 
     close(write_fileno);
+    fclose(write_to);
     return 0;
 }
 
@@ -94,10 +94,8 @@ nush_redirect_in(int index, svec* tokens) {
         int status;
         waitpid(cpid, &status, 0);
     } else {    // child
-        // close stdin
-        close(0);
         // set file to be 0 in file descriptor table
-        char rv = dup(read_from_fileno);
+        dup2(read_from_fileno, 0);
 
         execvp(left->data[0], left->data);
     }

@@ -59,6 +59,8 @@ read_string(char* line)
 void
 handle_line(char* line, svec* xs)
 {
+    char* argOrCmd;
+    char* operator;
     while(*line != 0) {
         if(isspace(*line)) {
             line++;
@@ -66,14 +68,15 @@ handle_line(char* line, svec* xs)
         }
 
         if(isoperator(*line)) {
-            char* operator = read_operator(line);
+            operator = read_operator(line);
             svec_push(xs, operator);
             line += strlen(operator);
+            free(operator);
             continue;
         }
 
         // read next arg or cmd
-        char* argOrCmd = read_string(line);
+        argOrCmd = read_string(line);
 
         // increment pointer by size of that arg/cmd
         int lengthArgCmd = strlen(argOrCmd);
@@ -81,6 +84,7 @@ handle_line(char* line, svec* xs)
 
         // adds the arg/cmd into our svec of tokens
         svec_push(xs, argOrCmd);
+        free(argOrCmd);
     }
 
 }
